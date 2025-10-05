@@ -7,7 +7,22 @@ Usage:
     python -m app.scripts.train_model --years 3 --samples-per-location 50
 
 This will:
-1. Sample global locations (varied climates)
+1. Sample global locat        # OOB score (if available)
+        oob_score = getattr(model, 'oob_score_', None)
+        
+        metrics = {
+            "mae": round(mae, 3),
+            "rmse": round(rmse, 3),
+            "r2_score": round(r2, 3),
+            "cv_r2_mean": round(cv_scores.mean(), 3),
+            "cv_r2_std": round(cv_scores.std(), 3),
+            "oob_r2_score": round(oob_score, 3) if oob_score is not None else None,
+            "accuracy_2mm": round(accuracy, 3),
+            "n_samples_train": len(self.X_train),
+            "n_samples_test": len(self.y_test),
+            "n_estimators": n_estimators,
+            "max_depth": max_depth
+        } climates)
 2. Collect historical data from NASA POWER
 3. Train RandomForest model
 4. Evaluate with cross-validation
@@ -137,9 +152,9 @@ class ModelTrainer:
                         location, sample_date
                     )
                     
-                    # Extract features (without historical_avg to avoid look-ahead bias)
+                    # Extract features
                     features = self.ml_predictor.extract_features(
-                        location, sample_date, historical_avg=0.0
+                        location, sample_date
                     )
                     
                     # Target is actual precipitation
@@ -206,15 +221,19 @@ class ModelTrainer:
         self.X_train_scaled = self.scaler.fit_transform(self.X_train)
         self.X_test_scaled = self.scaler.transform(self.X_test)
         
-        # Train model
+        # Train model with better hyperparameters for weather data
         model = RandomForestRegressor(
             n_estimators=n_estimators,
             max_depth=max_depth,
             min_samples_split=min_samples_split,
             min_samples_leaf=min_samples_leaf,
+            max_features='sqrt',  # Use sqrt(n_features) per split
+            min_impurity_decrease=0.0,  # Allow all splits
+            bootstrap=True,  # Bootstrap sampling
+            oob_score=True,  # Out-of-bag score for validation
             random_state=42,
             n_jobs=-1,  # Use all CPU cores
-            verbose=1
+            verbose=0  # Reduce verbosity
         )
         
         model.fit(self.X_train_scaled, self.y_train)
@@ -237,12 +256,16 @@ class ModelTrainer:
         within_threshold = np.abs(y_pred - self.y_test) <= 2.0
         accuracy = within_threshold.sum() / len(self.y_test)
         
+        # Extract OOB score if available
+        oob_score = getattr(model, 'oob_score_', None)
+        
         metrics = {
             "mae": round(mae, 3),
             "rmse": round(rmse, 3),
             "r2_score": round(r2, 3),
             "cv_r2_mean": round(cv_scores.mean(), 3),
             "cv_r2_std": round(cv_scores.std(), 3),
+            "oob_r2_score": round(oob_score, 3) if oob_score is not None else None,
             "accuracy_2mm": round(accuracy, 3),
             "n_samples_train": len(self.X_train),
             "n_samples_test": len(self.X_test),
@@ -255,6 +278,8 @@ class ModelTrainer:
         logger.info(f"📊 RMSE: {rmse:.3f}mm")
         logger.info(f"📊 R² Score: {r2:.3f}")
         logger.info(f"📊 CV R² (mean±std): {cv_scores.mean():.3f}±{cv_scores.std():.3f}")
+        if oob_score is not None:
+            logger.info(f"📊 OOB R² Score: {oob_score:.3f}")
         logger.info(f"📊 Accuracy (±2mm): {accuracy:.1%}")
         
         # Store model
@@ -275,8 +300,8 @@ class ModelTrainer:
             raise ValueError("Model not trained yet")
         
         feature_names = [
-            'latitude', 'longitude', 'day_of_year', 'month', 'season',
-            'historical_avg', 'distance_from_equator', 'is_tropical',
+            'latitude', 'longitude_norm', 'day_of_year', 'month', 'season',
+            'distance_from_equator', 'is_tropical',
             'day_sin', 'day_cos'
         ]
         

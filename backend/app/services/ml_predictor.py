@@ -90,27 +90,28 @@ class MLPredictor:
         """
         Extract features for ML prediction.
         
-        Features:
+        Features (9 total - removed historical_avg to avoid data leakage):
         - latitude: -90 to 90
-        - longitude: -180 to 180
+        - longitude: -180 to 180 (normalized)
         - day_of_year: 1 to 366
         - month: 1 to 12
         - season: 0 (winter), 1 (spring), 2 (summer), 3 (fall)
-        - historical_avg: average precipitation for this location/date
         - distance_from_equator: abs(latitude)
         - is_tropical: 1 if -23.5 < lat < 23.5, else 0
+        - day_sin/day_cos: Cyclical encoding of season
         
         Args:
             location: Location with lat/lon
             target_date: Date to predict for
-            historical_avg: Historical average precipitation (mm)
+            historical_avg: Historical average (DEPRECATED - not used in training)
         
         Returns:
             Feature array of shape (1, n_features)
         """
         # Basic features
         latitude = location.latitude
-        longitude = location.longitude
+        # Normalize longitude to 0-360 then to 0-1 for better scaling
+        longitude_norm = (location.longitude + 180) / 360.0
         day_of_year = target_date.timetuple().tm_yday
         month = target_date.month
         
@@ -118,23 +119,22 @@ class MLPredictor:
         # Season: 0=winter, 1=spring, 2=summer, 3=fall (Northern Hemisphere)
         season = (month % 12) // 3
         
-        # Distance from equator (proxy for temperature)
+        # Distance from equator (proxy for temperature/climate zone)
         distance_from_equator = abs(latitude)
         
         # Is tropical region? (±23.5° latitude)
         is_tropical = 1.0 if abs(latitude) < 23.5 else 0.0
         
-        # Seasonal sine/cosine (captures cyclical nature)
+        # Seasonal sine/cosine (captures cyclical nature of weather)
         day_sin = np.sin(2 * np.pi * day_of_year / 365.25)
         day_cos = np.cos(2 * np.pi * day_of_year / 365.25)
         
         features = np.array([
             latitude,
-            longitude,
+            longitude_norm,
             day_of_year,
             month,
             season,
-            historical_avg,
             distance_from_equator,
             is_tropical,
             day_sin,
@@ -199,8 +199,8 @@ class MLPredictor:
             
             # Feature importance (if available)
             feature_names = [
-                'latitude', 'longitude', 'day_of_year', 'month', 'season',
-                'historical_avg', 'distance_from_equator', 'is_tropical',
+                'latitude', 'longitude_norm', 'day_of_year', 'month', 'season',
+                'distance_from_equator', 'is_tropical',
                 'day_sin', 'day_cos'
             ]
             
