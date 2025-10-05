@@ -20,9 +20,14 @@ function App() {
           Will It Rain On My Parade?
         </h1>
         <p className="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">
-          Powered by NASA Earth observation data, this app estimates rain risk for your outdoor events. Enter a date
-          and location to see the precipitation outlook and plan confidently.
+          Powered by NASA GPM IMERG satellite data, this app shows historical precipitation patterns to help plan outdoor events.
         </p>
+        <div className="mt-3 max-w-2xl mx-auto bg-blue-950/40 border border-blue-800/50 rounded-lg px-4 py-3">
+          <p className="text-sm text-blue-200">
+            <strong className="font-semibold">ℹ️ Data Source:</strong> Uses real NASA satellite observations (not forecasts). 
+            Future dates show historical patterns from the previous year as estimates.
+          </p>
+        </div>
         <p className="mt-2 text-sm text-slate-500">Today is {todayLabel}</p>
       </header>
 

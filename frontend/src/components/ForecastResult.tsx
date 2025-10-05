@@ -18,11 +18,23 @@ export function ForecastResult({ forecast }: ForecastResultProps) {
           <h3 className="text-xl font-semibold text-white">Rain outlook</h3>
           <p className="text-sm text-slate-300">{eventDate}</p>
           <p className="mt-4 text-lg text-slate-100">{forecast.summary}</p>
-          <p className="text-sm text-slate-400 mt-2">
-            NASA Dataset: {forecast.nasa_dataset}
-            <br />
-            Issued at {issuedAt}
-          </p>
+          <div className="mt-3 bg-slate-800/40 border border-slate-700/50 rounded-lg px-3 py-2">
+            <p className="text-xs text-slate-400">
+              <strong>Data Source:</strong> {forecast.nasa_dataset}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              {forecast.nasa_dataset.includes('Historical Proxy') ? (
+                <>
+                  ⚠️ Future date: Using last year&apos;s satellite observations as seasonal estimate
+                </>
+              ) : (
+                <>
+                  ✓ Historical date: Real satellite measurements from GPM IMERG
+                </>
+              )}
+            </p>
+            <p className="text-xs text-slate-500 mt-1">Issued: {issuedAt}</p>
+          </div>
         </div>
         <div className="flex-1">
           <ProbabilityGauge probability={forecast.precipitation_probability} />
