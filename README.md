@@ -195,6 +195,8 @@ Comprehensive documentation is available:
   - Data quality and limitations
   
 - 🏗️ **[architecture.md](docs/architecture.md)**: System architecture overview
+- 🔧 **[TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)**: Comprehensive troubleshooting guide
+- 🚀 **[QUICKSTART.md](docs/QUICKSTART.md)**: Quick start guide for beginners
 
 ## Contributing
 
