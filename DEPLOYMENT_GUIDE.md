@@ -45,15 +45,21 @@
 
 4. **Configure environment variables**:
    - In Railway dashboard, go to "Variables" tab
+   - Click "+ New Variable"
    - Add these variables:
-     ```
-     CORS_ORIGINS=https://your-netlify-app.netlify.app
-     ```
+     - **Variable name**: `ALLOWED_ORIGINS`
+     - **Value**: `https://is-it-rains.netlify.app,http://localhost:5173`
+   
+   ⚠️ **IMPORTANT**: 
+   - Use `ALLOWED_ORIGINS` (not `CORS_ORIGINS`)
+   - Include your actual Netlify URL (e.g., `https://is-it-rains.netlify.app`)
+   - Separate multiple origins with commas (no spaces)
+   - Include `http://localhost:5173` for local development testing
    
 5. **Deploy**:
    - Railway automatically builds and deploys!
    - Wait 2-3 minutes
-   - Get your deployment URL: `https://your-app.railway.app`
+   - Get your deployment URL: `https://is-it-rain-production.up.railway.app/`
 
 6. **Test deployment**:
    ```bash
@@ -109,7 +115,7 @@
 2. **Create `.env.production` file**:
    ```bash
    cd frontend
-   echo "VITE_API_URL=https://your-app.railway.app" > .env.production
+   echo "VITE_API_URL=https://is-it-rain-production.up.railway.app" > .env.production
    ```
 
 3. **Test build locally**:
@@ -140,13 +146,21 @@
    - Wait 1-2 minutes
    - Get your URL: `https://your-app.netlify.app`
 
-8. **Update backend CORS**:
+8. **Update backend CORS** (CRITICAL STEP!):
    - Go back to Railway dashboard
-   - Update `CORS_ORIGINS` variable:
+   - Click on your backend service
+   - Go to "Variables" tab
+   - Find `ALLOWED_ORIGINS` variable (or create it if missing)
+   - Update the value to:
      ```
-     CORS_ORIGINS=https://your-app.netlify.app,http://localhost:5173
+     https://is-it-rains.netlify.app,http://localhost:5173
      ```
-   - Railway will auto-redeploy
+   - Click "Deploy" or wait for auto-redeploy (takes ~2 minutes)
+   
+   ✅ **Verify**: Check Railway logs for this line:
+   ```
+   Allowed origins: ['https://is-it-rains.netlify.app', 'http://localhost:5173']
+   ```
 
 9. **Test live app**:
    - Visit `https://your-app.netlify.app`
@@ -278,7 +292,7 @@
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `CORS_ORIGINS` | Yes | `http://localhost:5173` | Allowed frontend origins (comma-separated) |
+| `ALLOWED_ORIGINS` | Yes | `http://localhost:5173` | Allowed frontend origins (comma-separated, no spaces) |
 | `DATABASE_URL` | No | `sqlite:///data/forecasts.db` | Database connection string |
 | `NASA_POWER_API_URL` | No | NASA default | NASA POWER API endpoint |
 | `PORT` | No | `8000` | Server port (set by hosting provider) |
@@ -338,11 +352,59 @@ Open DevTools (F12) → Console:
 
 ### Issue: "CORS policy blocked"
 
-**Solution**: Update backend `CORS_ORIGINS` environment variable:
-```bash
-# Railway dashboard → Variables → CORS_ORIGINS
-CORS_ORIGINS=https://your-app.netlify.app,http://localhost:5173
+**Error message you'll see**:
 ```
+Access to XMLHttpRequest at 'https://backend.railway.app/api/forecast/ensemble' 
+from origin 'https://your-app.netlify.app' has been blocked by CORS policy: 
+Response to preflight request doesn't pass access control check: 
+No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
+
+**Root Cause**: Backend doesn't recognize your frontend's origin as allowed.
+
+**Solution** (Step-by-step):
+
+1. **Get your exact Netlify URL**:
+   - Go to Netlify dashboard
+   - Copy the exact URL (e.g., `https://is-it-rains.netlify.app`)
+   - Note: It must match exactly (including `https://` and no trailing slash)
+
+2. **Update Railway environment variable**:
+   - Go to Railway dashboard → Your backend service
+   - Click "Variables" tab
+   - Find or create `ALLOWED_ORIGINS` variable
+   - Set value to:
+     ```
+     https://is-it-rains.netlify.app,http://localhost:5173
+     ```
+   - Save changes
+
+3. **Wait for deployment**:
+   - Railway auto-redeploys (takes 2-3 minutes)
+   - Check logs for: `Allowed origins: ['https://is-it-rains.netlify.app', ...]`
+
+4. **Test CORS**:
+   ```bash
+   curl -X OPTIONS https://your-backend.railway.app/api/forecast/ensemble \
+     -H "Origin: https://is-it-rains.netlify.app" \
+     -H "Access-Control-Request-Method: POST" \
+     -v
+   
+   # Should see in response:
+   # Access-Control-Allow-Origin: https://is-it-rains.netlify.app
+   ```
+
+5. **Clear browser cache**:
+   - Press `Ctrl+Shift+R` (Windows/Linux) or `Cmd+Shift+R` (Mac)
+   - Or open DevTools → Network tab → "Disable cache" checkbox
+   - Refresh your Netlify app and try again
+
+**Common mistakes**:
+- ❌ Using `CORS_ORIGINS` instead of `ALLOWED_ORIGINS`
+- ❌ Missing `https://` prefix
+- ❌ Adding trailing slash: `https://site.netlify.app/`
+- ❌ Spaces after commas: `url1, url2` (should be `url1,url2`)
+- ❌ Wrong Netlify URL (check your actual deployed URL)
 
 ### Issue: "Network error" or "Failed to fetch"
 
