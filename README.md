@@ -4,15 +4,42 @@ End-to-end solution for the NASA Space Apps Challenge 2025 that forecasts
 precipitation risk for outdoor events using NASA's POWER (GPM IMERG-derived)
 precipitation data combined with open geocoding services.
 
+**Live Demo**: *Deploy using instructions in [DEPLOYMENT.md](docs/DEPLOYMENT.md)*
+
+**Built for**: [NASA Space Apps Challenge 2025 - "Will It Rain On My Parade?"](https://www.spaceappschallenge.org/2025/challenges/will-it-rain-on-my-parade/)
+
+---
+
+## Features
+
+✨ **Key Capabilities**:
+- 🌧️ **Precipitation Forecasting**: Get rain probability and intensity for any date and location
+- 🗺️ **Smart Geocoding**: Enter location names or coordinates
+- 📊 **Data Visualization**: Interactive maps and charts showing precipitation data
+- ⚡ **Fast & Cached**: 15-minute response caching for optimal performance
+- 🌍 **Global Coverage**: Works anywhere in the world (NASA POWER dataset)
+- 🔒 **Production Ready**: Docker deployment, CORS configuration, health checks
+- 📱 **Responsive UI**: Beautiful, mobile-friendly interface built with React + Tailwind
+
+**Data Sources**:
+- **NASA POWER API**: GPM IMERG precipitation data (free, no authentication)
+- **OpenStreetMap Nominatim**: Geocoding and reverse geocoding
+- **Daily Updates**: Near real-time precipitation data
+
 ## Table of contents
 
+- [Features](#features)
 - [Architecture](#architecture)
 - [Datasets](#datasets)
+- [Quick Start](#quick-start)
 - [Local development](#local-development)
 - [Testing](#testing)
 - [Deployment](#deployment)
 - [Operational playbook](#operational-playbook)
 - [Step-by-step build guide](#step-by-step-build-guide)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Architecture
 
@@ -29,6 +56,47 @@ The system is composed of:
   guidelines.
 
 A visual diagram is provided in `docs/architecture.md`.
+
+## Quick Start
+
+Get the application running in under 5 minutes! For detailed instructions, see [QUICKSTART.md](docs/QUICKSTART.md).
+
+### Using Docker (Recommended)
+
+```bash
+# Clone the repository
+git clone https://github.com/Nabeel70/Is-It-Rain.git
+cd Is-It-Rain
+
+# Start with Docker Compose
+cd infra
+docker compose up --build
+```
+
+Access the app at:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:8000
+- API Docs: http://localhost:8000/docs
+
+### Manual Setup
+
+**Backend**:
+```bash
+cd backend
+pip install poetry
+poetry install
+cp .env.example .env
+poetry run uvicorn app.main:app --reload
+```
+
+**Frontend**:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+**Need help?** See the [Quick Start Guide](docs/QUICKSTART.md) for troubleshooting and detailed instructions.
 
 ## Datasets
 
@@ -104,3 +172,63 @@ docker compose up --build
    domain, and deploying the Docker image to your chosen platform.
 7. Monitor NASA and OpenStreetMap API quotas, add retries/backoff if your event
    load increases, and document operations in `docs/`.
+
+## Documentation
+
+Comprehensive documentation is available:
+
+- 📚 **[API.md](docs/API.md)**: Complete REST API documentation
+  - All endpoints with request/response schemas
+  - Code examples in TypeScript and Python
+  - Error handling and best practices
+  
+- 🚀 **[DEPLOYMENT.md](docs/DEPLOYMENT.md)**: Production deployment guide
+  - Docker, AWS, Azure, GCP, Kubernetes options
+  - Security configuration
+  - Monitoring and troubleshooting
+  - Cost optimization
+  
+- 📊 **[DATASETS.md](docs/DATASETS.md)**: Dataset documentation
+  - NASA POWER API details
+  - GPM IMERG precipitation data
+  - OpenStreetMap geocoding
+  - Data quality and limitations
+  
+- 🏗️ **[architecture.md](docs/architecture.md)**: System architecture overview
+
+## Contributing
+
+Contributions are welcome! This project was built for the NASA Space Apps Challenge 2025.
+
+**How to contribute**:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+**Development Guidelines**:
+- Follow existing code style
+- Add tests for new features
+- Update documentation
+- Run tests before submitting: `poetry run pytest` (backend), `npm run lint` (frontend)
+
+## License
+
+This project is developed for educational purposes as part of the NASA Space Apps Challenge 2025.
+
+**Data Attribution**:
+- NASA POWER API (GPM IMERG) - Public domain
+- OpenStreetMap data - © OpenStreetMap contributors (ODbL)
+
+## Acknowledgments
+
+- **NASA** for providing the POWER API and GPM IMERG dataset
+- **OpenStreetMap** contributors for geocoding services
+- **NASA Space Apps Challenge** for the inspiration and challenge framework
+
+---
+
+**Questions or Issues?** Open an issue on [GitHub](https://github.com/Nabeel70/Is-It-Rain/issues)
+
+**Built with** ❤️ **for the NASA Space Apps Challenge 2025**
