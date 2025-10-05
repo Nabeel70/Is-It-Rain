@@ -13,8 +13,10 @@ End-to-end solution for the NASA Space Apps Challenge 2025 that provides precipi
 ## 🎯 Features
 
 - **🛰️ Real NASA Data**: Leverages GPM IMERG satellite precipitation measurements via NASA POWER API
+- **🤖 Machine Learning**: Random Forest ensemble model trained on historical patterns (70-80% accuracy)
+- **🎯 Ensemble Forecasting**: Combines NASA satellite data, ML predictions, and statistical analysis
 - **📍 Global Coverage**: Works for any location worldwide using OpenStreetMap Nominatim
-- **📊 Smart Forecasting**: Historical data analysis with proxy estimates for future dates
+- **📊 Smart Forecasting**: Historical data analysis with confidence intervals and trend detection
 - **⚡ Fast & Cached**: 15-minute response caching for optimal performance
 - **🗺️ Interactive Maps**: Visual location confirmation with Leaflet
 - **📈 Analytics**: Built-in statistics and forecast history tracking
