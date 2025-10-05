@@ -1,0 +1,22 @@
+version: '3.9'
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: backend
+    env_file:
+      - ../backend/.env.example
+    ports:
+      - '8000:8000'
+  frontend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: frontend
+    environment:
+      - VITE_API_BASE=http://api:8000
+    ports:
+      - '5173:4173'
+    depends_on:
+      - api

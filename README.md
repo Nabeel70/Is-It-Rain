@@ -1,1 +1,106 @@
-# Is-It-Rain
+# Will It Rain On My Parade?
+
+End-to-end solution for the NASA Space Apps Challenge 2025 that forecasts
+precipitation risk for outdoor events using NASA's POWER (GPM IMERG-derived)
+precipitation data combined with open geocoding services.
+
+## Table of contents
+
+- [Architecture](#architecture)
+- [Datasets](#datasets)
+- [Local development](#local-development)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Operational playbook](#operational-playbook)
+- [Step-by-step build guide](#step-by-step-build-guide)
+
+## Architecture
+
+The system is composed of:
+
+- **Frontend** (`frontend/`): React + Vite single-page app with Tailwind, Leaflet
+  maps, and Recharts visualizations.
+- **Backend** (`backend/`): FastAPI service that geocodes user locations,
+  retrieves NASA precipitation data, applies heuristic risk scoring, and
+  responds with a structured forecast.
+- **Infrastructure** (`infra/`): Docker-based setup for local orchestration and
+  deployment artifacts.
+- **Docs & Data** (`docs/`, `data/`): Architectural overview and dataset usage
+  guidelines.
+
+A visual diagram is provided in `docs/architecture.md`.
+
+## Datasets
+
+- **NASA POWER API** (`PRECTOTCORR`): Daily corrected precipitation totals
+  derived from the GPM IMERG constellation. Free, no authentication required.
+- **OpenStreetMap Nominatim**: Geocoding and reverse geocoding to convert human
+  place names into coordinates and friendly labels.
+
+See `data/README.md` for sample queries and expansion ideas (e.g., MERRA-2,
+IMERG half-hourly data via GES DISC).
+
+## Local development
+
+1. **Backend**
+   ```bash
+   cd backend
+   poetry install
+   cp .env.example .env
+   poetry run uvicorn app.main:app --reload
+   ```
+2. **Frontend**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+3. Visit http://localhost:5173. The Vite dev server proxies `/api` to the
+   FastAPI backend at http://localhost:8000.
+
+Alternatively, run the full stack with Docker:
+
+```bash
+cd infra
+docker compose up --build
+```
+
+## Testing
+
+- **Backend**: `cd backend && poetry run pytest`
+- **Frontend**: `cd frontend && npm run lint`
+
+## Deployment
+
+- Build the production backend image: `docker build --target backend -t is-it-rain-api .`
+- Deploy behind a reverse proxy (e.g., Azure App Service, AWS ECS, or Google
+  Cloud Run). Static frontend assets (Vite build output) are copied into the
+  backend image under `/app/static` and can be served via a CDN or the API
+  container.
+
+## Operational playbook
+
+- Rate limiting: configure an API gateway (e.g., Cloudflare) to shield external
+  access to NASA POWER and OpenStreetMap.
+- Caching: the backend uses an in-memory TTL cache by default; swap in Redis by
+  replacing `app/core/cache.py` with a Redis client if horizontal scaling is
+  required.
+- Observability: integrate FastAPI logging with OpenTelemetry exporters for
+  traces/metrics.
+
+## Step-by-step build guide
+
+1. Clone the repository and review the architecture overview in
+   `docs/architecture.md`.
+2. Set up Python 3.11 and Node 20 runtimes (or use Docker).
+3. Install backend dependencies with Poetry, configure environment variables via
+   `.env`, and run the FastAPI dev server.
+4. Install frontend dependencies with npm, start the Vite dev server, and verify
+   that event submissions return forecasts.
+5. Explore dataset expansion opportunities by inspecting `data/README.md` and
+   referencing NASA POWER documentation. Consider augmenting with IMERG
+   half-hourly or ECMWF reanalysis for ensemble modeling.
+6. Harden for production by enabling HTTPS, setting `ALLOWED_ORIGINS` to your
+   domain, and deploying the Docker image to your chosen platform.
+7. Monitor NASA and OpenStreetMap API quotas, add retries/backoff if your event
+   load increases, and document operations in `docs/`.
