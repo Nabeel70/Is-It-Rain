@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { ForecastRequest, ForecastResponse } from '../types/api';
 
-const RAW_API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
+const RAW_API_BASE_URL = import.meta.env.VITE_API_URL ?? 'https://is-it-rain-production.up.railway.app/';
 const API_BASE_WITH_PROTOCOL = /^https?:\/\//i.test(RAW_API_BASE_URL)
   ? RAW_API_BASE_URL
   : `https://${RAW_API_BASE_URL}`;
