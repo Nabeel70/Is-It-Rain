@@ -1,14 +1,11 @@
-[nixPacks]
-providers = ["python"]
-
-[nixPacks.phases.setup]
+[phases.setup]
 nixPkgs = ["python312", "poetry"]
 
-[nixPacks.phases.install]
+[phases.install]
 cmds = ["cd backend && poetry install --no-dev"]
 
-[nixPacks.phases.build]
-cmds = ["cd backend && echo 'Build complete'"]
+[phases.build]
+cmds = ["echo 'Build phase complete'"]
 
 [start]
 cmd = "cd backend && poetry run uvicorn app.main:app --host 0.0.0.0 --port $PORT"
