@@ -15,9 +15,12 @@ Everything is ready:
 - ✅ ML models committed to Git (2.5MB total)
 - ✅ Dependencies properly configured
 - ✅ Frontend builds successfully
+- ✅ Dockerfile renamed to `Dockerfile.local` (prevents Railway conflicts)
 - ✅ All code pushed to GitHub
 
 **Your Repository**: https://github.com/Nabeel70/Is-It-Rain
+
+**⚠️ CRITICAL FIX APPLIED**: The `Dockerfile` has been renamed to `Dockerfile.local` because Railway prioritizes Dockerfiles over other configs, which was causing it to deploy the frontend instead of the backend. Now Railway will use `railway.json` and `nixpacks.toml` correctly.
 
 ---
 
@@ -49,9 +52,15 @@ Everything is ready:
 ### Step 3: Railway Auto-Detection
 
 Railway will automatically detect your repository. You should see:
-- ✅ Detected: Python
+- ✅ Detected: Python (or Nixpacks)
 - ✅ Detected: Poetry
 - ✅ Found: `railway.json`
+- ✅ **NOT detecting Dockerfile** (we renamed it to `Dockerfile.local`)
+
+**⚠️ IMPORTANT**: If Railway says "Dockerfile detected", **STOP**:
+- The push with renamed Dockerfile hasn't reached Railway yet
+- Wait 30 seconds and refresh the page
+- Or manually select **"Nixpacks"** as the builder
 
 Click **"Deploy Now"**
 
@@ -288,12 +297,27 @@ curl -X OPTIONS https://is-it-rain-backend.up.railway.app/api/forecast/ensemble 
 
 ### Problem 1: Railway deploying frontend instead of backend
 
-**Symptoms**: Health check returns HTML instead of JSON
+**Symptoms**: Health check returns HTML instead of JSON, or error like "executable `cd` could not be found"
 
-**Solution**:
+**Root Cause**: Railway detected and used `Dockerfile` instead of `railway.json`
+
+**Solution Option 1 - Force Nixpacks Builder**:
+1. Railway Dashboard → Service → Settings
+2. Scroll to **"Builder"** section
+3. Change from "Dockerfile" to **"Nixpacks"**
+4. Go to Deployments → **"Redeploy"**
+
+**Solution Option 2 - Set Root Directory**:
 1. Railway Dashboard → Service → Settings
 2. Set **Root Directory** to: `backend`
-3. Go to Deployments → Click latest → **"Redeploy"**
+3. Set **Builder** to: `Nixpacks`
+4. Go to Deployments → Click latest → **"Redeploy"**
+
+**Solution Option 3 - Verify Dockerfile is renamed**:
+1. Check your GitHub repo: should have `Dockerfile.local` (NOT `Dockerfile`)
+2. If `Dockerfile` still exists, Railway will use it
+3. Make sure latest commit is pushed to GitHub
+4. Railway → Settings → **"Disconnect and reconnect GitHub repo"**
 
 ### Problem 2: "Module not found: app.main"
 
