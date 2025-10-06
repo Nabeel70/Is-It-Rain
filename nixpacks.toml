@@ -2,7 +2,7 @@
 nixPkgs = ["python312", "poetry"]
 
 [phases.install]
-cmds = [
+cmds = [ 
 	"cd backend && (poetry env use python3.12 || poetry env use python3.11 || poetry env use python3) && poetry install --no-dev"
 ]
 
