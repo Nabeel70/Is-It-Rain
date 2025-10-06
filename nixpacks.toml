@@ -1,11 +1,8 @@
 [phases.setup]
-nixPkgs = ["python311", "poetry"]
+nixPkgs = ["python312", "poetry"]
 
 [phases.install]
-cmds = [
-	"cd backend && poetry env use python3.11",
-	"cd backend && poetry install --no-dev"
-]
+cmds = ["cd backend && poetry install --no-dev"]
 
 [phases.build]
 cmds = ["echo 'Build phase complete'"]
