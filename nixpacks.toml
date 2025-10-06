@@ -3,11 +3,14 @@ nixPkgs = ["python312", "poetry"]
 
 [phases.install]
 cmds = [ 
-	"cd backend && (poetry env use python3.12 || poetry env use python3.11 || poetry env use python3) && poetry install --no-dev"
+	"cd backend",
+	"poetry config virtualenvs.in-project true",
+	"(poetry env use python3.12 || poetry env use python3.11 || poetry env use python3)",
+	"poetry install --no-dev"
 ]
 
 [phases.build]
 cmds = ["echo 'Build phase complete'"]
 
 [start]
-cmd = "cd backend && poetry run uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+cmd = "cd /app/backend && /app/backend/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port $PORT"
