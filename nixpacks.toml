@@ -2,7 +2,7 @@
 nixPkgs = ["python312", "poetry"]
 
 [phases.install]
-cmds = ["cd backend && poetry install --no-dev"]
+cmds = ["cd backend && poetry install --without dev"]
 
 [phases.build]
 cmds = ["echo 'Build phase complete'"]
