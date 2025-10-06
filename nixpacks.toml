@@ -2,7 +2,7 @@
 nixPkgs = ["python312", "poetry"]
 
 [phases.install]
-cmds = ["cd backend && poetry config virtualenvs.in-project true && (poetry env use python3.12 || poetry env use python3.11 || poetry env use python3) && poetry install --no-dev"]
+cmds = ["cd backend && poetry config virtualenvs.in-project true && (poetry env use python3.12 || poetry env use python3.11 || poetry env use python3) && poetry install --only main"]
 
 [phases.build]
 cmds = ["echo 'Build phase complete'"]
