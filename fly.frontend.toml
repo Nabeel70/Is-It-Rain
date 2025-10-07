@@ -1,22 +1,24 @@
-# Frontend Static Site
-app = "is-it-rain-frontend"
-primary_region = "sin"  # Singapore
+# fly.toml app configuration file generated for is-it-rain-frontend on 2025-10-07T07:10:11Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'is-it-rain-frontend'
+primary_region = 'sin'
 
 [build]
-  dockerfile = "Dockerfile.frontend.fly"
+  dockerfile = 'Dockerfile.frontend.fly'
 
 [env]
-  PORT = "8080"
-  VITE_API_URL = "https://is-it-rain-api.fly.dev"
+  PORT = '8080'
+  VITE_API_URL = 'https://is-it-rain-api-dry-cherry-1903.fly.dev'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
 
 [[vm]]
-  cpu_kind = "shared"
-  cpus = 1
-  memory_mb = 256
+  size = 'shared-cpu-1x'
