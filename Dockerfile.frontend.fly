@@ -12,6 +12,10 @@ COPY frontend/tailwind.config.cjs ./
 COPY frontend/index.html ./
 COPY frontend/src ./src
 
+# Set build-time environment variable for Vite
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
+
 # Install dependencies and build
 RUN npm install && npm run build
 

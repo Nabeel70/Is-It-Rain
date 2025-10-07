@@ -8,10 +8,11 @@ primary_region = 'sin'
 
 [build]
   dockerfile = 'Dockerfile.frontend.fly'
+  [build.args]
+    VITE_API_URL = 'https://is-it-rain-api-dry-cherry-1903.fly.dev'
 
 [env]
   PORT = '8080'
-  VITE_API_URL = 'https://is-it-rain-api-dry-cherry-1903.fly.dev'
 
 [http_service]
   internal_port = 8080
