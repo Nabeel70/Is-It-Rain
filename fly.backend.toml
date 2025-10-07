@@ -1,30 +1,32 @@
-# Backend API
-app = "is-it-rain-api"
-primary_region = "sin"  # Singapore
+# fly.toml app configuration file generated for is-it-rain-api-dry-cherry-1903 on 2025-10-07T07:01:43Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'is-it-rain-api-dry-cherry-1903'
+primary_region = 'sin'
 
 [build]
-  dockerfile = "Dockerfile.fly"
+  dockerfile = 'Dockerfile.fly'
 
 [env]
-  PORT = "8080"
-  ALLOWED_ORIGINS = "https://is-it-rain-frontend.fly.dev,http://localhost:5173"
-  DATABASE_URL = "sqlite:///./data/forecasts.db"
+  ALLOWED_ORIGINS = 'https://is-it-rain-frontend.fly.dev,http://localhost:5173'
+  DATABASE_URL = 'sqlite:///./data/forecasts.db'
+  PORT = '8080'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  
+
   [[http_service.checks]]
-    grace_period = "10s"
-    interval = "30s"
-    method = "GET"
-    timeout = "5s"
-    path = "/health"
+    interval = '30s'
+    timeout = '5s'
+    grace_period = '10s'
+    method = 'GET'
+    path = '/health'
 
 [[vm]]
-  cpu_kind = "shared"
-  cpus = 1
-  memory_mb = 256
+  size = 'shared-cpu-1x'
