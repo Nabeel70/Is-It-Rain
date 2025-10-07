@@ -1,0 +1,30 @@
+# Backend API
+app = "is-it-rain-api"
+primary_region = "sin"  # Singapore
+
+[build]
+  dockerfile = "Dockerfile.fly"
+
+[env]
+  PORT = "8080"
+  ALLOWED_ORIGINS = "https://is-it-rain-frontend.fly.dev,http://localhost:5173"
+  DATABASE_URL = "sqlite:///./data/forecasts.db"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256

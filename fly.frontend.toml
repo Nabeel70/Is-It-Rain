@@ -1,0 +1,22 @@
+# Frontend Static Site
+app = "is-it-rain-frontend"
+primary_region = "sin"  # Singapore
+
+[build]
+  dockerfile = "Dockerfile.frontend.fly"
+
+[env]
+  PORT = "8080"
+  VITE_API_URL = "https://is-it-rain-api.fly.dev"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256
